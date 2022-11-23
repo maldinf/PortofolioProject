@@ -22,6 +22,19 @@ drop column total_houses_destroyed_description
 
 ##  Provinsi mana yang paling banyak memiliki letusan gunungapi  ##
 select 
+	distinct(name_volcano)
+from volcanoevent v 
+where island = 'Nusa Tenggara'
+
+select 
+	year,
+	erupt_date,
+	name_volcano,
+	island
+from volcanoevent v 
+where island = 'Nusa Tenggara'
+
+select 
 	island,
 	count(erupt_date) as total_erupt,
 	max(vei) as max_vei
@@ -34,24 +47,30 @@ select
 	year,
 	location,
 	name_volcano,
+	count(tsunami) as total_tsunami,
+	count(gempabumi) as total_gempabumi
+from volcanoevent v 
+where 
+	tsunami is not null or 
+	gempabumi is not null
+group by name_volcano 
+order by total_tsunami desc
+
+##  Letusan gunungapi yang memiliki paling banyak letusan dengan jumlah korban terbanyak dilihat dari injuries dan deathh  ##
+select
+	name_volcano,
+	erupt_date
+from volcanoevent v 
+where name_volcano = 'Merapi'
+
+select 
+	year,
+	location,
+	name_volcano,
 	count(erupt_date) as total_erupt,
 	count(deaths) as total_mati,
 	count(injuries) as total_injuries 
 from volcanoevent v 
-group by location 
+group by name_volcano 
 order by total_mati desc
-
-##  Letusan gunungapi yang memiliki paling banyak letusan dengan jumlah korban terbanyak dilihat dari injuries dan deathh  ##
-select
-	*,
-	rank() over(partition by name_volcano order by year desc) as ranking
-		from (
-		select 
-			year,
-			name_volcano,
-			count(erupt_date) as total_erupt
-from volcanoevent v 
-) as vl
-group by name_volcano
-order by total_erupt desc
 
