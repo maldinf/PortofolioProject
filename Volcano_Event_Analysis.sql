@@ -22,25 +22,35 @@ drop column total_houses_destroyed_description
 
 ##  Provinsi mana yang paling banyak memiliki letusan gunungapi  ##
 select 
-	distinct(name_volcano)
+	island,
+	count(erupt_date) as total_erupt
 from volcanoevent v 
-where island = 'Nusa Tenggara'
-
-select 
-	year,
-	erupt_date,
-	name_volcano,
-	island
-from volcanoevent v 
-where island = 'Nusa Tenggara'
+group by island
+order by vei desc
 
 select 
 	island,
-	count(erupt_date) as total_erupt,
-	max(vei) as max_vei
+	count(erupt_date) as total_erupt
 from volcanoevent v 
 group by island
-order by max_vei desc
+order by vei desc
+
+with volcanE as
+	(select 
+		year,
+		name_volcano,
+		island,
+		count(erupt_date) as total_erupt,
+		vei
+	from volcanoevent v 
+	where island = 'Java'
+	)
+select 
+	island,
+	total_erupt
+from volcanE
+group by island
+order by vei desc
 
 ##  Gunungapi apa saja yang letusannya yang diikuti oleh tsunami dan gempabumi  ##
 select 
@@ -56,6 +66,26 @@ where
 group by name_volcano 
 order by total_tsunami desc
 
+with vulcan as 
+	(select 
+		year,
+		name_volcano,
+		island,
+		count(tsunami) as total_tsunami,
+		count(gempabumi) as total_gempabumi
+	from volcanoevent v 
+	where 
+		tsunami is not null or 
+		gempabumi is not null
+	group by name_volcano 
+	order by total_tsunami desc
+	)
+select 
+	name_volcano,
+	total_tsunami,
+	total_gempabumi
+from vulcan
+
 ##  Letusan gunungapi yang memiliki paling banyak letusan dengan jumlah korban terbanyak dilihat dari injuries dan deathh  ##
 select
 	name_volcano,
@@ -63,14 +93,23 @@ select
 from volcanoevent v 
 where name_volcano = 'Merapi'
 
+with volcan as 
+	(select 
+		year,
+		location,
+		name_volcano,
+		count(erupt_date) as total_erupt,
+		count(deaths) as total_mati,
+		count(injuries) as total_injuries 
+	from volcanoevent v 
+	group by name_volcano 
+	order by total_mati desc
+	)
 select 
-	year,
-	location,
 	name_volcano,
-	count(erupt_date) as total_erupt,
-	count(deaths) as total_mati,
-	count(injuries) as total_injuries 
-from volcanoevent v 
-group by name_volcano 
-order by total_mati desc
+	total_erupt,
+	total_mati,
+	total_injuries
+from volcan
+
 
