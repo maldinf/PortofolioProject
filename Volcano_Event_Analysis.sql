@@ -43,12 +43,6 @@ group by provinsi_pernama_gunung
 order by total_eruptdate desc
 
 ## Melihat sejarah erupsi gunungapi yang berada di Jawa Timur##
-select 
-	distinct name_volcano
-from volcanoevent v 
-where island = 'Java'
-
-## Melihat gunungapi yang memiliki letusan terbanyak di Pulau Jawa ##
 with vulcanEr as
 	(select 
 		name_volcano,
